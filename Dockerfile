@@ -21,8 +21,6 @@ ENV NODE_ENV production
 RUN rm -rf /usr/share/nginx/html/*
 # copy built assets from 'builder' stage
 COPY --from=builder /usr/src/next-nginx/out /usr/share/nginx/html
-# add nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
 # expose port 80 for nginx
 EXPOSE 80 443
 # start nginx
