@@ -174,7 +174,7 @@ export class BaseApi {
 
   public refresh_token = async () => {
     if (localStorage.getItem("refresh_token")) {
-      let url = new URL(`${process.env.REACT_APP_BACKEND_URI}/api/v1/token/refresh/`);
+      let url = new URL(`${process.env.NEXT_PUBLIC_BACKEND_URI}/api/v1/token/refresh/`);
       const headers: HeadersInit = new Headers(this.base_headers);
       headers.set('Content-Type', 'application/json');
       let response = await fetch(

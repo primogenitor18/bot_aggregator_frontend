@@ -21,6 +21,25 @@ export function Auth(props: PropsWithChildren) {
     setAccessToken(window.localStorage.getItem('access_token'))
   }, [])
 
+  useEffect(() => {
+    if (!accessToken) { return }
+    getAccountInfo()
+  }, [accessToken])
+
+  const getAccountInfo = async () => {
+    setLoading(true)
+    const api = new BaseApi(1, 'account/info');
+    let res = await api.get(
+      {}, () => {}, {}
+    );
+    if (res.status !== 200) {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      setAccessToken(null)
+    };
+    setLoading(false)
+  }
+
   const auth = async () => {
     setLoading(true)
     const api = new BaseApi(1, 'auth/login');
