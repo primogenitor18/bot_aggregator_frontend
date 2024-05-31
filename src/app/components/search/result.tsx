@@ -98,7 +98,7 @@ export function SearchResult(props: ISearchResultProps) {
         </Box>
         <CardContent>
           <Typography>Completed requests: {providerInfo.queryCountAll}</Typography>
-          <Typography>Lost requests: {providerInfo.queryCountApiLimit}</Typography>
+          <Typography>Remaining requests: {providerInfo.queryCountApiLimit}</Typography>
           <Divider sx={{ marginTop: '5px', marginBottom: '5px' }} />
           {searchData.data?.map((sr) => {
             return (
