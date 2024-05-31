@@ -56,7 +56,6 @@ export function Auth(props: PropsWithChildren) {
 
   return (
     <>
-      {process.env.NODE_ENV}
       {accessToken
         ? <>{props.children}</>
         : <Box

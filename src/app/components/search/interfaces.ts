@@ -6,3 +6,7 @@ export interface ISearchResult {
   providerName: string;
   data: IProviderSearchResult[];
 }
+
+export interface IProviderInfo {
+  name: string
+}
