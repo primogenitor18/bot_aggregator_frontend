@@ -104,11 +104,15 @@ export function SearchResult(props: ISearchResultProps) {
             return (
               <>
                 {Object.keys(sr).map((k: string) => {
-                  return (
-                    <Typography key={`result-key-${k}`} variant="body2">
-                      {k}: {sr[k].toString()}
-                    </Typography>
-                  )
+                  if (sr[k]) {
+                    return (
+                      <Typography key={`result-key-${k}`} variant="body2">
+                        {k}: {sr[k].toString()}
+                      </Typography>
+                    )
+                  } else {
+                    return <></>
+                  }
                 })}
                 <Divider sx={{ marginTop: '5px', marginBottom: '5px' }} />
               </>
