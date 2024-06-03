@@ -104,7 +104,7 @@ export function SearchResult(props: ISearchResultProps) {
             return (
               <>
                 {Object.keys(sr).map((k: string) => {
-                  if (sr[k]) {
+                  if (sr[k].toString()) {
                     return (
                       <Typography key={`result-key-${k}`} variant="body2">
                         {k}: {sr[k].toString()}
