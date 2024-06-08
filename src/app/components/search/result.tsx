@@ -107,7 +107,7 @@ export function SearchResult(props: ISearchResultProps) {
                   if (sr[k].toString()) {
                     return (
                       <Typography key={`result-key-${k}`} variant="body2">
-                        {k}: {sr[k].toString()}
+                        {k}: {(k !== 'link') ? sr[k].toString() : <a href={sr[k].toString()} target="_blank">{sr[k].toString()}</a>}
                       </Typography>
                     )
                   } else {
