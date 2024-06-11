@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 
 import { BaseApi } from '@/app/api/base';
 
+import { WebSocket } from "../websocket/websocket";
 
 export function Auth(props: PropsWithChildren) {
   const [username, setUsername] = useState<string>('')
@@ -57,7 +58,10 @@ export function Auth(props: PropsWithChildren) {
   return (
     <>
       {accessToken
-        ? <>{props.children}</>
+        ? <>
+            <WebSocket accessToken={String(accessToken)} />
+            {props.children}
+          </>
         : <Box
           sx={{
             display: 'block',
