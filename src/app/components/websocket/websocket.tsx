@@ -10,8 +10,12 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { styled } from '@mui/material/styles';
 
+import { IDcitionary } from '@/app/types/types';
+import { INameDictMap } from '@/app/types/props';
+
 interface IWebsocketProps {
   accessToken: string
+  children: React.ReactNode
 }
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -29,15 +33,29 @@ export const WebSocket = (props: IWebsocketProps) => {
   const [socketUrl, setSocketUrl] = useState<string>(uri.href);
   const [open, setOpen] = React.useState<boolean>(false);
   const [tgCode, setTgCode] = React.useState<string>('')
+  const [lastSocketMessages, setLastSocketMessages] = React.useState<INameDictMap>({})
+  const childrenWithProps = React.Children.map(props.children, (child) => {
+    if (React.isValidElement(child)) {
+      return React.cloneElement(child as React.ReactElement<any>, { socketMessages: lastSocketMessages });
+    }
+    return child;
+  });
 
   const { sendMessage, lastMessage, readyState, getWebSocket } = useWebSocket(
     socketUrl,
     {
       share: true,
       onMessage: (event: MessageEvent<any>) => { 
-        let data = JSON.parse(event.data)
-        if (data.event_type === 'code_request') {
+        let data: IDcitionary<number | string | boolean | undefined> = JSON.parse(event.data)
+        let _key: string = String(data.name)
+        if (data.event_type === 'connect') {
+          localStorage.setItem('SocketId', String(data.socket_id))
+          return
+        } else if (data.event_type === 'code_request') {
           setOpen(true)
+          return
+        } else if (_key) {
+          setLastSocketMessages({ ...lastSocketMessages, [_key]: data })
           return
         }
       },
@@ -82,6 +100,7 @@ export const WebSocket = (props: IWebsocketProps) => {
           </BootstrapDialog>
         : ''
       }
+      {childrenWithProps}
     </div>
   );
 };

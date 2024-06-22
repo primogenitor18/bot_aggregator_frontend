@@ -16,7 +16,13 @@ import { IProviderInfo } from './interfaces';
 
 import { BaseApi } from '@/app/api/base';
 
-export function SearchData() {
+import { INameDictMap } from '@/app/types/props';
+
+interface ISearchData {
+  socketMessages?: INameDictMap
+}
+
+export function SearchData(props: ISearchData) {
   const [fts, setFts] = React.useState<string>('')
   const [startSearch, setStartSearch] = React.useState<boolean>(true)
   const [loading, setLoading] = React.useState<boolean>(false)
@@ -146,6 +152,7 @@ export function SearchData() {
                         searchType={searchType}
                         country={country}
                         key={`provider-result-key-${provider.name}`}
+                        socketMessages={props.socketMessages}
                       />
                     )
                   })}

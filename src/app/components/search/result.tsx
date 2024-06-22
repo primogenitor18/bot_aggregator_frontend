@@ -13,17 +13,43 @@ import { BaseApi } from '@/app/api/base';
 
 import { ISearchResult, IProviderSearchResult } from './interfaces';
 
+import { INameDictMap } from '@/app/types/props';
+
 interface ISearchResultProps {
   fts: string
   search: boolean
   provider: string
   searchType: string
   country: string
+  socketMessages?: INameDictMap
 }
 
 interface IProviderUserInfo {
   queryCountAll: number
   queryCountApiLimit: number
+}
+
+interface ISearchResultItem {
+  sr: any
+}
+
+function SearchResultItem(props: ISearchResultItem) {
+  return (
+    <>
+      {Object.keys(props.sr).map((k: string) => {
+        if (props.sr[k].toString()) {
+          return (
+            <Typography key={`result-key-${k}`} variant="body2">
+              {k}: {(k !== 'link') ? props.sr[k].toString() : <a href={props.sr[k].toString()} target="_blank">{props.sr[k].toString()}</a>}
+            </Typography>
+          )
+        } else {
+          return <></>
+        }
+      })}
+      <Divider sx={{ marginTop: '5px', marginBottom: '5px' }} />
+    </>
+  )
 }
 
 export function SearchResult(props: ISearchResultProps) {
@@ -100,24 +126,22 @@ export function SearchResult(props: ISearchResultProps) {
           <Typography>Completed requests: {providerInfo.queryCountAll}</Typography>
           <Typography>Remaining requests: {providerInfo.queryCountApiLimit}</Typography>
           <Divider sx={{ marginTop: '5px', marginBottom: '5px' }} />
-          {searchData.data?.map((sr) => {
-            return (
-              <>
-                {Object.keys(sr).map((k: string) => {
-                  if (sr[k].toString()) {
-                    return (
-                      <Typography key={`result-key-${k}`} variant="body2">
-                        {k}: {(k !== 'link') ? sr[k].toString() : <a href={sr[k].toString()} target="_blank">{sr[k].toString()}</a>}
-                      </Typography>
-                    )
-                  } else {
-                    return <></>
-                  }
+          {props.socketMessages && props.socketMessages[props.provider]
+            ? <>
+                {props.socketMessages[props.provider].data?.map((sr, index) => {
+                  return (
+                    <SearchResultItem sr={sr} key={`search-result-for-provider-${index}-socket`} />
+                  )
                 })}
-                <Divider sx={{ marginTop: '5px', marginBottom: '5px' }} />
               </>
-            )
-          })}
+            : <>
+                {searchData.data?.map((sr, index) => {
+                  return (
+                    <SearchResultItem sr={sr} key={`search-result-for-provider-${index}`} />
+                  )
+                })}
+              </>
+          }
         </CardContent>
       </Card>
     </Box>

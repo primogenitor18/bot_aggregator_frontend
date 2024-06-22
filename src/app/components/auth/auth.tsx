@@ -59,8 +59,9 @@ export function Auth(props: PropsWithChildren) {
     <>
       {accessToken
         ? <>
-            <WebSocket accessToken={String(accessToken)} />
-            {props.children}
+            <WebSocket accessToken={String(accessToken)}>
+              {props.children}
+            </WebSocket>
           </>
         : <Box
           sx={{

@@ -24,6 +24,7 @@ export class BaseApi {
     const headers: HeadersInit = new Headers(this.base_headers);
     headers.set('Authorization', `Bearer ${localStorage.getItem('access_token')}`);
     headers.set('Content-Type', 'application/json');
+    headers.set('SocketId', `${localStorage.getItem('SocketId')}`);
     let response = await fetch(
       uri.href,
       {
@@ -37,6 +38,7 @@ export class BaseApi {
         localStorage.setItem("access_token", res.body.access_token);
         localStorage.setItem("refresh_token", res.body.refresh_token);
         headers.set('Authorization', `Bearer ${res.body.access_token}`);
+        headers.set('SocketId', `${localStorage.getItem('SocketId')}`);
         response = await fetch(
           uri.href,
           {
@@ -88,6 +90,7 @@ export class BaseApi {
   ) => {
     const headers: HeadersInit = new Headers(this.base_headers);
     headers.set('Authorization', `Bearer ${localStorage.getItem('access_token')}`);
+    headers.set('SocketId', `${localStorage.getItem('SocketId')}`);
     var json_body: string = '';
     var form_body: FormData = new FormData;
     if (content_type === 'application/json') {
@@ -127,6 +130,7 @@ export class BaseApi {
         localStorage.setItem("access_token", res.body.access_token);
         localStorage.setItem("refresh_token", res.body.refresh_token);
         headers.set('Authorization', `Bearer ${res.body.access_token}`);
+        headers.set('SocketId', `${localStorage.getItem('SocketId')}`);
         response = await fetch(
           this.url.href,
           {
@@ -177,6 +181,7 @@ export class BaseApi {
       let url = new URL(`${process.env.NEXT_PUBLIC_BACKEND_URI}/api/v1/token/refresh/`);
       const headers: HeadersInit = new Headers(this.base_headers);
       headers.set('Content-Type', 'application/json');
+      headers.set('SocketId', `${localStorage.getItem('SocketId')}`);
       let response = await fetch(
         url.href,
         {
