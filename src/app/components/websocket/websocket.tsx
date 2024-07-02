@@ -9,6 +9,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { styled } from '@mui/material/styles';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 import { IDcitionary } from '@/app/types/types';
 import { INameDictMap } from '@/app/types/props';
@@ -34,6 +36,7 @@ export const WebSocket = (props: IWebsocketProps) => {
   const [open, setOpen] = React.useState<boolean>(false);
   const [tgCode, setTgCode] = React.useState<string>('')
   const [lastSocketMessages, setLastSocketMessages] = React.useState<INameDictMap>({})
+  const [recievedSocketId, setRecievedSocketId] = React.useState<bool>(false)
   const childrenWithProps = React.Children.map(props.children, (child) => {
     if (React.isValidElement(child)) {
       return React.cloneElement(child as React.ReactElement<any>, { socketMessages: lastSocketMessages });
@@ -50,6 +53,7 @@ export const WebSocket = (props: IWebsocketProps) => {
         let _key: string = String(data.name)
         if (data.event_type === 'connect') {
           localStorage.setItem('SocketId', String(data.socket_id))
+          setRecievedSocketId(true)
           return
         } else if (data.event_type === 'code_request') {
           setOpen(true)
@@ -100,7 +104,12 @@ export const WebSocket = (props: IWebsocketProps) => {
           </BootstrapDialog>
         : ''
       }
-      {childrenWithProps}
+      {recievedSocketId
+        ? <>{childrenWithProps}</>
+        : <Box sx={{ display: 'flex' }}>
+            <CircularProgress />
+          </Box>
+      }
     </div>
   );
 };
