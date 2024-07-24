@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import { BaseApi } from '@/app/api/base';
 
 import { WebSocket } from "../websocket/websocket";
+import ButtonAppBar from "../appBar/appBar";
 
 export function Auth(props: PropsWithChildren) {
   const [username, setUsername] = useState<string>('')
@@ -37,6 +38,8 @@ export function Auth(props: PropsWithChildren) {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       setAccessToken(null)
+    } else {
+      localStorage.setItem("username", res?.body?.username);
     };
     setLoading(false)
   }
@@ -55,11 +58,20 @@ export function Auth(props: PropsWithChildren) {
     setLoading(false)
   }
 
+  const logOut = async () => {
+    setLoading(true)
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    setAccessToken(null)
+    setLoading(false)
+  }
+
   return (
     <>
       {accessToken
         ? <>
             <WebSocket accessToken={String(accessToken)}>
+              <ButtonAppBar logOut={logOut} />
               {props.children}
             </WebSocket>
           </>

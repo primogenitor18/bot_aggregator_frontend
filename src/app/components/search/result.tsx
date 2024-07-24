@@ -1,13 +1,12 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
-import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import LinearProgress from '@mui/material/LinearProgress';
 import Divider from '@mui/material/Divider';
+import Checkbox from '@mui/material/Checkbox';
 
 import { BaseApi } from '@/app/api/base';
 
@@ -63,15 +62,18 @@ export function SearchResult(props: ISearchResultProps) {
   const [providerInfo, setProviderInfo] = React.useState<IProviderUserInfo>(
     { queryCountAll: 0, queryCountApiLimit: 0 }
   )
+  const [acceptSearch, setAcceptSearch] = React.useState<bool>(true)
 
   React.useEffect(() => { getProviderInfo() }, [])
 
   React.useEffect(() => {
+    if (!acceptSearch) { return }
     if ( props.fts === '' || !props.search ) { return }
     getSearchData()
   }, [props.fts])
 
   React.useEffect(() => {
+    if (!acceptSearch) { return }
     if ( props.fts === '' || !props.search ) { return }
     getSearchData()
   }, [props.search])
@@ -115,7 +117,14 @@ export function SearchResult(props: ISearchResultProps) {
   return (
     <Box sx={{ minWidth: 275, maxWidth: 400 }}>
       <Card variant="outlined">
-        <CardHeader title={props.provider} />
+        <CardHeader
+          title={
+            <Box sx={{ display: 'flex' }}>
+              <Checkbox defaultChecked onChange={(e) => {setAcceptSearch(e.target.checked)}} />
+              <Typography variant='h5'>{props.provider}</Typography>
+            </Box>
+          }
+        />
         <Box>
           {progress
             ? <LinearProgress />
