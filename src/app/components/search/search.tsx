@@ -141,6 +141,7 @@ export function SearchData(props: ISearchData) {
                   sx={{
                     marginTop: '10px',
                     display: 'flex',
+                    overflowX: 'auto',
                   }}
                 >
                   {providers.map((provider) => {
