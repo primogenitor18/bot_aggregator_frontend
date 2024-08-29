@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState, useCallback, useEffect } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 
@@ -11,6 +13,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { styled } from '@mui/material/styles';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 import { IDcitionary } from '@/app/types/types';
 import { INameDictMap } from '@/app/types/props';
@@ -36,7 +39,7 @@ export const WebSocket = (props: IWebsocketProps) => {
   const [open, setOpen] = React.useState<boolean>(false);
   const [tgCode, setTgCode] = React.useState<string>('')
   const [lastSocketMessages, setLastSocketMessages] = React.useState<INameDictMap>({})
-  const [recievedSocketId, setRecievedSocketId] = React.useState<bool>(false)
+  const [recievedSocketId, setRecievedSocketId] = React.useState<boolean>(false)
   const childrenWithProps = React.Children.map(props.children, (child) => {
     if (React.isValidElement(child)) {
       return React.cloneElement(child as React.ReactElement<any>, { socketMessages: lastSocketMessages });
@@ -54,17 +57,20 @@ export const WebSocket = (props: IWebsocketProps) => {
         if (data.event_type === 'connect') {
           localStorage.setItem('SocketId', String(data.socket_id))
           setRecievedSocketId(true)
-          return
         } else if (data.event_type === 'code_request') {
           setOpen(true)
-          return
         } else if (_key) {
           setLastSocketMessages({ ...lastSocketMessages, [_key]: data })
-          return
         }
       },
     }
   );
+
+  useEffect(() => {
+    if (window.localStorage.getItem('SocketId')) {
+      setRecievedSocketId(true)
+    }
+  }, [])
 
   const handleSendCode = () => {
     if (!tgCode) { return }
@@ -106,9 +112,7 @@ export const WebSocket = (props: IWebsocketProps) => {
       }
       {recievedSocketId
         ? <>{childrenWithProps}</>
-        : <Box sx={{ display: 'flex' }}>
-            <CircularProgress />
-          </Box>
+        : <CircularProgress />
       }
     </div>
   );

@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Operators",
+  title: "SHUM Operators",
   description: "OSINT operators client",
 };
 
@@ -16,7 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={inter.className}
+        style={{ backgroundColor: "#d1d1d1" }}
+      >{children}</body>
     </html>
   );
 }
