@@ -14,6 +14,9 @@ import Paper from '@mui/material/Paper';
 import TablePagination from '@mui/material/TablePagination';
 import CircularProgress from '@mui/material/CircularProgress';
 import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+
+import ReplayIcon from '@mui/icons-material/Replay';
 
 import { BaseApi } from '@/app/api/base';
 
@@ -22,6 +25,8 @@ interface ITask {
   task_id: string
   filename: string
   status: string
+  created_at: Date
+  full_report: string
 }
 
 export function Tasks() {
@@ -53,11 +58,40 @@ export function Tasks() {
             task_id: task.task_id,
             filename: task.filename,
             status: task.status,
+            created_at: new Date(task.created_at),
+            full_report: task.full_report,
           } as ITask
         }
       ))
       setTasksCount(res.body.count)
     };
+    setLoading(false)
+  }
+
+  const restartTask = async (task_id: int) => {
+    setLoading(true)
+    const api = new BaseApi(1, 'search/search_task/restart');
+    let res = await api.post(
+      { task_id: task_id }, 'application/json', () => {}, {}
+    );
+    if (res.status === 200) {
+      setTasks(
+        tasks.map((task: ITask) => {
+          if (task.id !== task_id) {
+            return task
+          } else {
+            return {
+              id: task.id,
+              task_id: task.task_id,
+              filename: task.filename,
+              status: 'pending',
+              created_at: new Date(task.created_at),
+              full_report: task.full_report,
+            } as ITask
+          }
+        })
+      )
+    }
     setLoading(false)
   }
 
@@ -74,9 +108,12 @@ export function Tasks() {
                 <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                   <TableHead>
                     <TableRow>
-                      <TableCell>Task id</TableCell>
-                      <TableCell align="right">Status</TableCell>
-                      <TableCell align="right">Filename</TableCell>
+                      <TableCell align="center"></TableCell>
+                      <TableCell align="center">Task id</TableCell>
+                      <TableCell align="center">Status</TableCell>
+                      <TableCell align="center">Task file</TableCell>
+                      <TableCell align="center">Created date</TableCell>
+                      <TableCell align="center">Report file</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -86,11 +123,20 @@ export function Tasks() {
                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                       >
                         <TableCell component="th" scope="row">
+                          <IconButton aria-label="delete" size="large" onClick={() => {restartTask(task.id)}}>
+                            <ReplayIcon />
+                          </IconButton>
+                        </TableCell>
+                        <TableCell align="center">
                           <Link href={`/tasks/${task.id}`}>{task.task_id}</Link>
                         </TableCell>
-                        <TableCell align="right">{task.status}</TableCell>
-                        <TableCell align="right">
+                        <TableCell align="center">{task.status}</TableCell>
+                        <TableCell align="center">
                           <a href={`${process.env.NEXT_PUBLIC_BACKEND_URI}/api/${task.filename}`} target="_blank">{task.filename.split('/')[task.filename.split('/').length - 1]}</a>
+                        </TableCell>
+                        <TableCell align="center">{task.created_at.toUTCString()}</TableCell>
+                        <TableCell align="center">
+                          {(task.full_report) ? <a href={`${process.env.NEXT_PUBLIC_BACKEND_URI}/api/${task.full_report}`} target="_blank">Report</a> : <></>}
                         </TableCell>
                       </TableRow>
                     ))}
