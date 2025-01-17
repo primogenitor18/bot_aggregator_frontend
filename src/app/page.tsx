@@ -1,8 +1,8 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
+import * as React from "react";
+import Box from "@mui/material/Box";
 
-import { Auth } from './components/auth/auth';
-import { SearchData } from './components/search/search';
+import { Auth } from "./components/auth/auth";
+import { SearchData } from "./components/search/search";
 
 export default function Home() {
   return (
