@@ -8,9 +8,9 @@ export class BaseApi {
   }
 
   public create_url(v: number, endpoint: string): URL {
-    return new URL(
-      `${process.env.NEXT_PUBLIC_BACKEND_URI}/api/v${v}/${endpoint}`
-    );
+    const baseUri =
+      process.env.NEXT_PUBLIC_BACKEND_URI || "http://localhost:3000";
+    return new URL(`/api/v${v}/${endpoint}`, baseUri);
   }
 
   private get_delete = async (

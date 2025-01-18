@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import { Auth } from "./components/auth/auth";
 import { SearchData } from "./components/search/search";
 
-export default function Home() {
+const Home: React.FC = () => {
   return (
     <Box>
       <Auth>
@@ -12,4 +12,6 @@ export default function Home() {
       </Auth>
     </Box>
   );
-}
+};
+
+export default Home;
