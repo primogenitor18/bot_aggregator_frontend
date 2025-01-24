@@ -12,9 +12,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
 import Typography from "@mui/material/Typography";
-import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
-import CloseIcon from "@mui/icons-material/Close";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 
@@ -30,7 +28,6 @@ interface ReportResponse {
 export function TaskCreate({ onTaskCreated }: { onTaskCreated?: () => void }) {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [file, setFile] = React.useState<File | null>(null);
-  const [taskId, setTaskId] = React.useState<string>("");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -133,15 +130,17 @@ export function TaskCreate({ onTaskCreated }: { onTaskCreated?: () => void }) {
   );
 }
 
-export function TaskReport() {
-  const { id } = useParams();
+interface TaskReportProps {
+  id: number;
+}
 
+export function TaskReport({ id }: TaskReportProps) {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [files, setFiles] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     getReport();
-  }, []);
+  }, [id]);
 
   const getReport = async () => {
     setLoading(true);
@@ -159,7 +158,19 @@ export function TaskReport() {
   return (
     <Box>
       {loading ? (
-        <CircularProgress />
+        <Box
+          sx={{
+            padding: "20px",
+            width: "fit-content",
+            marginLeft: "auto",
+            marginRight: "auto",
+            display: "flex",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : files.length === 0 ? (
+        <Typography variant="body1">Files not found</Typography>
       ) : (
         <List>
           {files.map((file: string) => (
@@ -178,18 +189,16 @@ export function TaskReport() {
   );
 }
 
-export function TaskInfo() {
-  const { id } = useParams();
-
-  return (
-    <Box>
-      <Box sx={{ display: "flex", padding: "20px" }}>
-        <ArrowBackIcon color="primary" />
-        <Typography variant="h6" color="primary">
-          <Link href="/tasks">Return</Link>
-        </Typography>
-      </Box>
-      {id && id !== "0" ? <TaskReport /> : <TaskCreate />}
-    </Box>
-  );
-}
+// export function TaskInfo() {
+//   return (
+//     <Box>
+//       <Box sx={{ display: "flex", padding: "20px" }}>
+//         <ArrowBackIcon color="primary" />
+//         <Typography variant="h6" color="primary">
+//           <Link href="/tasks">Return</Link>
+//         </Typography>
+//       </Box>
+//       <TaskReport />
+//     </Box>
+//   );
+// }

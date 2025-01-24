@@ -21,7 +21,7 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import { BaseApi } from "@/app/api/base";
 import { Button, Modal, Tooltip } from "@mui/material";
 
-import { TaskCreate } from "./taskInfo";
+import { TaskCreate, TaskReport } from "./taskInfo";
 
 interface ITask {
   id: number;
@@ -38,33 +38,42 @@ export function Tasks() {
   const [limit, setLimit] = React.useState<number>(10);
   const [offset, setOffset] = React.useState<number>(0);
   const [loading, setLoading] = React.useState<boolean>(false);
+  const [selectedTaskId, setSelectedTaskId] = React.useState<number | null>(
+    null
+  );
+  const [openReportModal, setOpenReportModal] = React.useState(false);
 
   const [openModal, setOpenModal] = React.useState(false);
 
   const handleOpenModal = () => setOpenModal(true);
   const handleCloseModal = () => setOpenModal(false);
 
-  React.useEffect(() => {
-    getTasks();
-  }, [offset]);
+  const handleOpenReportModal = (taskId: number | null) => {
+    setSelectedTaskId(taskId);
+    setOpenReportModal(true);
+  };
+  const handleCloseReportModal = () => {
+    setSelectedTaskId(null);
+    setOpenReportModal(false);
+  };
 
   React.useEffect(() => {
     getTasks();
-  }, [limit]);
+  }, [offset, limit]);
 
   const mockTasks: ITask[] = [
     {
       id: 1,
       task_id: "task_001",
-      filename: "path/to/file_1.txt",
+      filename: "file_1.txt",
       status: "completed",
       created_at: new Date("2023-01-01"),
-      full_report: "path/to/report_1.txt",
+      full_report: "report_1.txt",
     },
     {
       id: 2,
       task_id: "task_002",
-      filename: "path/to/file_2.txt",
+      filename: "file_2.txt",
       status: "pending",
       created_at: new Date("2023-01-02"),
       full_report: "",
@@ -101,7 +110,7 @@ export function Tasks() {
     setLoading(false);
   };
 
-  const restartTask = async (task_id: int) => {
+  const restartTask = async (task_id: number) => {
     setLoading(true);
     const api = new BaseApi(1, "search/search_task/restart");
     let res = await api.post(
@@ -207,34 +216,47 @@ export function Tasks() {
                         </Tooltip>
                       </TableCell>
                       <TableCell align="center">
-                        <Link href={`/tasks/${task.id}`}>{task.task_id}</Link>
+                        <Button
+                          variant="text"
+                          color="primary"
+                          sx={{ textTransform: "none" }}
+                          onClick={() => handleOpenReportModal(task.id)}
+                        >
+                          {task.task_id}
+                        </Button>
                       </TableCell>
                       <TableCell align="center">{task.status}</TableCell>
                       <TableCell align="center">
-                        <a
+                        <Button
+                          variant="text"
+                          color="primary"
+                          component="a"
                           href={`${process.env.NEXT_PUBLIC_BACKEND_URI}/api/${task.filename}`}
                           target="_blank"
+                          sx={{ textTransform: "none" }}
                         >
                           {
                             task.filename.split("/")[
                               task.filename.split("/").length - 1
                             ]
                           }
-                        </a>
+                        </Button>
                       </TableCell>
                       <TableCell align="center">
                         {task.created_at.toUTCString()}
                       </TableCell>
                       <TableCell align="center">
-                        {task.full_report ? (
-                          <a
+                        {task.full_report && (
+                          <Button
+                            variant="text"
+                            color="primary"
+                            component="a"
                             href={`${process.env.NEXT_PUBLIC_BACKEND_URI}/api/${task.full_report}`}
                             target="_blank"
+                            sx={{ textTransform: "none" }}
                           >
                             Report
-                          </a>
-                        ) : (
-                          <></>
+                          </Button>
                         )}
                       </TableCell>
                     </TableRow>
@@ -260,6 +282,23 @@ export function Tasks() {
           </Paper>
         </>
       )}
+      <Modal open={openReportModal} onClose={handleCloseReportModal}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 600,
+            bgcolor: "background.paper",
+            borderRadius: "8px",
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          {selectedTaskId && <TaskReport id={selectedTaskId} />}
+        </Box>
+      </Modal>
     </Box>
   );
 }
