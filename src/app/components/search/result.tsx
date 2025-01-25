@@ -32,6 +32,16 @@ interface ISearchResultItem {
   sr: any;
 }
 
+interface ApiResponse<T = any> {
+  status: number;
+  body?: T;
+}
+
+interface ProviderInfoResponse {
+  query_count_all: number;
+  query_count_api_limit: number;
+}
+
 function SearchResultItem(props: ISearchResultItem) {
   return (
     <>
@@ -43,7 +53,11 @@ function SearchResultItem(props: ISearchResultItem) {
               {k !== "link" ? (
                 props.sr[k].toString()
               ) : (
-                <a href={props.sr[k].toString()} target="_blank">
+                <a
+                  href={props.sr[k].toString()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   {props.sr[k].toString()}
                 </a>
               )}
@@ -75,29 +89,18 @@ export function SearchResult(props: ISearchResultProps) {
   }, []);
 
   React.useEffect(() => {
-    if (!acceptSearch) {
-      return;
-    }
-    if (props.fts === "" || !props.search) {
-      return;
-    }
+    if (!acceptSearch || props.fts === "" || !props.search) return;
     getSearchData();
-  }, [props.fts]);
-
-  React.useEffect(() => {
-    if (!acceptSearch) {
-      return;
-    }
-    if (props.fts === "" || !props.search) {
-      return;
-    }
-    getSearchData();
-  }, [props.search]);
+  }, [props.fts, props.search]);
 
   const getProviderInfo = async () => {
     const api = new BaseApi(1, "provider/get_info");
-    let res = await api.get({ provider: props.provider }, () => {}, {});
-    if (res.status === 200) {
+    const res: ApiResponse<ProviderInfoResponse> = await api.get(
+      { provider: props.provider },
+      () => {},
+      {}
+    );
+    if (res.status === 200 && res.body) {
       setProviderInfo({
         queryCountAll: res?.body?.query_count_all,
         queryCountApiLimit: res?.body?.query_count_api_limit,
@@ -119,12 +122,15 @@ export function SearchResult(props: ISearchResultProps) {
       () => {},
       {}
     );
-    if (res.status === 200) {
+    if (res.status === 200 && res.body) {
       setSearchData(res?.body);
       await getProviderInfo();
     }
     setProgress(false);
   };
+
+  const results: any =
+    props.socketMessages?.[props.provider]?.data || searchData.data;
 
   return (
     <Box sx={{ minWidth: 275, maxWidth: 400 }}>
@@ -151,29 +157,9 @@ export function SearchResult(props: ISearchResultProps) {
             Remaining requests: {providerInfo.queryCountApiLimit}
           </Typography>
           <Divider sx={{ marginTop: "5px", marginBottom: "5px" }} />
-          {props.socketMessages && props.socketMessages[props.provider] ? (
-            <>
-              {props.socketMessages[props.provider].data?.map((sr, index) => {
-                return (
-                  <SearchResultItem
-                    sr={sr}
-                    key={`search-result-for-provider-${index}-socket`}
-                  />
-                );
-              })}
-            </>
-          ) : (
-            <>
-              {searchData.data?.map((sr, index) => {
-                return (
-                  <SearchResultItem
-                    sr={sr}
-                    key={`search-result-for-provider-${index}`}
-                  />
-                );
-              })}
-            </>
-          )}
+          {results.map((sr, index) => (
+            <SearchResultItem sr={sr} key={`search-result-${index}`} />
+          ))}
         </CardContent>
       </Card>
     </Box>

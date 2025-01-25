@@ -23,6 +23,39 @@ interface ISearchData {
   socketMessages?: INameDictMap;
 }
 
+const mockProviders = [
+  {
+    name: "Provider 1",
+    type: "Internet",
+    country: "RU",
+  },
+  {
+    name: "Provider 2",
+    type: "Electricity",
+    country: "UA",
+  },
+  {
+    name: "Provider 3",
+    type: "Telecommunications",
+    country: "BY",
+  },
+  {
+    name: "Provider 4",
+    type: "Water",
+    country: "KZ",
+  },
+  {
+    name: "Provider 5",
+    type: "Gas",
+    country: "RU",
+  },
+  {
+    name: "Provider 6",
+    type: "Insurance",
+    country: "UA",
+  },
+];
+
 export function SearchData(props: ISearchData) {
   const [fts, setFts] = React.useState<string>("");
   const [startSearch, setStartSearch] = React.useState<boolean>(false);
@@ -31,8 +64,17 @@ export function SearchData(props: ISearchData) {
   const [country, setCountry] = React.useState<string>("");
   const [searchType, setSearchType] = React.useState<string>("");
 
+  // React.useEffect(() => {
+  //   getProviders();
+  // }, []);
+
   React.useEffect(() => {
-    getProviders();
+    // Имитируем загрузку провайдеров
+    setLoading(true);
+    setTimeout(() => {
+      setProviders(mockProviders); // Заменяем данные на моковые
+      setLoading(false);
+    }, 1000); // Задержка, как если бы данные загружались
   }, []);
 
   const handleSearch = () => {
@@ -46,24 +88,24 @@ export function SearchData(props: ISearchData) {
     setFts(e.target.value);
   };
 
-  const getProviders = async () => {
-    setLoading(true);
-    const api = new BaseApi(1, "provider/list");
-    try {
-      const res: { status: number; body?: any } = await api.get(
-        {},
-        () => {},
-        {}
-      );
-      if (res.status === 200 && Array.isArray(res.body)) {
-        setProviders(res.body || []);
-      }
-    } catch (error) {
-      console.error("Error fetching providers:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const getProviders = async () => {
+  //   setLoading(true);
+  //   const api = new BaseApi(1, "provider/list");
+  //   try {
+  //     const res: { status: number; body?: any } = await api.get(
+  //       {},
+  //       () => {},
+  //       {}
+  //     );
+  //     if (res.status === 200 && Array.isArray(res.body)) {
+  //       setProviders(res.body || []);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching providers:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <Box
