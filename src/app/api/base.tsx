@@ -1,3 +1,8 @@
+interface ApiResponse<T = any> {
+  status: number;
+  body?: T;
+}
+
 export class BaseApi {
   url: URL;
   base_headers: HeadersInit;
@@ -144,7 +149,7 @@ export class BaseApi {
         callback({ ...current_state, logged_in: false });
       }
     }
-    let res = { status: 400 };
+    let res: ApiResponse = { status: 400 };
     try {
       res = { status: response.status, body: await response.json() };
     } catch (error) {

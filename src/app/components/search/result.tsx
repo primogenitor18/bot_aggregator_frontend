@@ -95,7 +95,7 @@ export function SearchResult(props: ISearchResultProps) {
 
   const getProviderInfo = async () => {
     const api = new BaseApi(1, "provider/get_info");
-    const res: ApiResponse<ProviderInfoResponse> = await api.get(
+    const res: ApiResponse = await api.get(
       { provider: props.provider },
       () => {},
       {}
@@ -111,7 +111,7 @@ export function SearchResult(props: ISearchResultProps) {
   const getSearchData = async () => {
     setProgress(true);
     const api = new BaseApi(1, "search/fts");
-    let res = await api.post(
+    let res: ApiResponse = await api.post(
       {
         fts: props.fts,
         provider: props.provider,
@@ -133,7 +133,7 @@ export function SearchResult(props: ISearchResultProps) {
     props.socketMessages?.[props.provider]?.data || searchData.data;
 
   return (
-    <Box sx={{ minWidth: 275, maxWidth: 400 }}>
+    <Box sx={{ minWidth: 200, maxWidth: 400 }}>
       <Card variant="outlined">
         <CardHeader
           title={
@@ -157,7 +157,7 @@ export function SearchResult(props: ISearchResultProps) {
             Remaining requests: {providerInfo.queryCountApiLimit}
           </Typography>
           <Divider sx={{ marginTop: "5px", marginBottom: "5px" }} />
-          {results.map((sr, index) => (
+          {results.map((sr: ISearchResultItem, index: number) => (
             <SearchResultItem sr={sr} key={`search-result-${index}`} />
           ))}
         </CardContent>

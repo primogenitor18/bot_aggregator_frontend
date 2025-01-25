@@ -206,9 +206,15 @@ export function SearchData(props: ISearchData) {
           {providers.length ? (
             <Box
               sx={{
-                marginTop: "10px",
+                marginLeft: "auto",
+                marginRight: "auto",
+                marginTop: "20px",
                 display: "flex",
-                overflowX: "auto",
+                flexWrap: "wrap",
+                gap: 2,
+                justifyContent: "center",
+                alignItems: "center",
+                width: "760px",
               }}
             >
               {providers.map((provider) => {
