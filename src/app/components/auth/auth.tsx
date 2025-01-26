@@ -28,74 +28,74 @@ export function Auth(props: PropsWithChildren) {
     localStorage.removeItem("refresh_token");
   };
 
-  // useEffect(() => {
-  //   const storedToken = window.localStorage.getItem("access_token");
-  //   if (!storedToken) {
-  //     router.push("/login");
-  //     return;
-  //   }
-  //   setAccessToken(storedToken);
-  // }, []);
+  useEffect(() => {
+    const storedToken = window.localStorage.getItem("access_token");
+    if (!storedToken) {
+      router.push("/login");
+      return;
+    }
+    setAccessToken(storedToken);
+  }, []);
 
-  // useEffect(() => {
-  //   if (accessToken) {
-  //     getAccountInfo();
-  //   }
-  // }, [accessToken]);
+  useEffect(() => {
+    if (accessToken) {
+      getAccountInfo();
+    }
+  }, [accessToken]);
 
-  // const getAccountInfo = async () => {
-  //   if (!accessToken) return;
+  const getAccountInfo = async () => {
+    if (!accessToken) return;
 
-  //   setLoading(true);
-  //   const api = new BaseApi(1, "account/info");
-  //   try {
-  //     let res: ApiResponse = await api.get({}, () => {}, {});
-  //     if (res.status !== 200) {
-  //       clearTokens();
-  //       setAccessToken(null);
-  //       router.push("/login");
-  //     } else {
-  //       if (res.body?.username) {
-  //         localStorage.setItem("username", res.body.username);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     clearTokens();
-  //     setAccessToken(null);
-  //     router.push("/login");
-  //     toast.error("Error fetching user information.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  const logOut = async () => {
-    // setLoading(true);
-    // clearTokens();
-    // setAccessToken(null);
-    router.push("/login");
-    // setLoading(false);
+    setLoading(true);
+    const api = new BaseApi(1, "account/info");
+    try {
+      let res: ApiResponse = await api.get({}, () => {}, {});
+      if (res.status !== 200) {
+        clearTokens();
+        setAccessToken(null);
+        router.push("/login");
+      } else {
+        if (res.body?.username) {
+          localStorage.setItem("username", res.body.username);
+        }
+      }
+    } catch (error) {
+      clearTokens();
+      setAccessToken(null);
+      router.push("/login");
+      toast.error("Error fetching user information.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // if (loading || !accessToken) {
-  //   return (
-  //     <CircularProgress
-  //       sx={{
-  //         position: "absolute",
-  //         top: "50%",
-  //         left: "50%",
-  //         transform: "translate(-50%, -50%)",
-  //       }}
-  //     />
-  //   );
-  // }
+  const logOut = async () => {
+    setLoading(true);
+    clearTokens();
+    setAccessToken(null);
+    router.push("/login");
+    setLoading(false);
+  };
+
+  if (loading || !accessToken) {
+    return (
+      <CircularProgress
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      />
+    );
+  }
 
   return (
     <>
-      {/* <WebSocket accessToken={String(accessToken)}> */}
-      <ButtonAppBar logOut={logOut} />
-      {props.children}
-      {/* </WebSocket> */}
+      <WebSocket accessToken={String(accessToken)}>
+        <ButtonAppBar logOut={logOut} />
+        {props.children}
+      </WebSocket>
       <Toaster />
     </>
   );

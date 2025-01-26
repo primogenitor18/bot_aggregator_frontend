@@ -37,7 +37,7 @@ export default function ButtonAppBar(props: IBarProps) {
 
   React.useEffect(() => {
     const timer = setTimeout(() => setShow(true), 500);
-    return () => clearTimeout(timer); // Чистка таймера при размонтировании компонента
+    return () => clearTimeout(timer);
   }, []);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {

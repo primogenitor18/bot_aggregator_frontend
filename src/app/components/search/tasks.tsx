@@ -80,35 +80,35 @@ export function Tasks() {
     },
   ];
 
-  // const getTasks = async () => {
-  //   setLoading(true);
-  //   const api = new BaseApi(1, "search/search_tasks/list");
-  //   let res = await api.get({ limit: limit, offset: offset }, () => {}, {});
-  //   if (res.status === 200) {
-  //     setTasks(
-  //       res.body.result.map((task: any) => {
-  //         return {
-  //           id: task.id,
-  //           task_id: task.task_id,
-  //           filename: task.filename,
-  //           status: task.status,
-  //           created_at: new Date(task.created_at),
-  //           full_report: task.full_report,
-  //         } as ITask;
-  //       })
-  //     );
-  //     setTasksCount(res.body.count);
-  //   }
-  //   setLoading(false);
-  // };
-
   const getTasks = async () => {
     setLoading(true);
-    // Замените этот блок на фиктивные данные
-    setTasks(mockTasks);
-    setTasksCount(mockTasks.length);
+    const api = new BaseApi(1, "search/search_tasks/list");
+    let res = await api.get({ limit: limit, offset: offset }, () => {}, {});
+    if (res.status === 200) {
+      setTasks(
+        res.body.result.map((task: any) => {
+          return {
+            id: task.id,
+            task_id: task.task_id,
+            filename: task.filename,
+            status: task.status,
+            created_at: new Date(task.created_at),
+            full_report: task.full_report,
+          } as ITask;
+        })
+      );
+      setTasksCount(res.body.count);
+    }
     setLoading(false);
   };
+
+  // const getTasks = async () => {
+  //   setLoading(true);
+  //   //фиктивные данные
+  //   setTasks(mockTasks);
+  //   setTasksCount(mockTasks.length);
+  //   setLoading(false);
+  // };
 
   const restartTask = async (task_id: number) => {
     setLoading(true);
