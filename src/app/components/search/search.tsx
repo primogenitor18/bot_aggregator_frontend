@@ -23,39 +23,6 @@ interface ISearchData {
   socketMessages?: INameDictMap;
 }
 
-const mockProviders = [
-  {
-    name: "Provider 1",
-    type: "Internet",
-    country: "RU",
-  },
-  {
-    name: "Provider 2",
-    type: "Electricity",
-    country: "UA",
-  },
-  {
-    name: "Provider 3",
-    type: "Telecommunications",
-    country: "BY",
-  },
-  {
-    name: "Provider 4",
-    type: "Water",
-    country: "KZ",
-  },
-  {
-    name: "Provider 5",
-    type: "Gas",
-    country: "RU",
-  },
-  {
-    name: "Provider 6",
-    type: "Insurance",
-    country: "UA",
-  },
-];
-
 export function SearchData(props: ISearchData) {
   const [fts, setFts] = React.useState<string>("");
   const [startSearch, setStartSearch] = React.useState<boolean>(false);
@@ -67,15 +34,6 @@ export function SearchData(props: ISearchData) {
   React.useEffect(() => {
     getProviders();
   }, []);
-
-  // React.useEffect(() => {
-  //   // Имитируем загрузку провайдеров
-  //   setLoading(true);
-  //   setTimeout(() => {
-  //     setProviders(mockProviders); // Заменяем данные на моковые
-  //     setLoading(false);
-  //   }, 1000); // Задержка, как если бы данные загружались
-  // }, []);
 
   const handleSearch = () => {
     setStartSearch(true);

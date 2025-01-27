@@ -132,15 +132,22 @@ export function TaskCreate({ onTaskCreated }: { onTaskCreated?: () => void }) {
 
 interface TaskReportProps {
   id: number;
+  onNoFiles: () => void;
 }
 
-export function TaskReport({ id }: TaskReportProps) {
+export function TaskReport({ id, onNoFiles }: TaskReportProps) {
   const [loading, setLoading] = React.useState<boolean>(false);
   const [files, setFiles] = React.useState<string[]>([]);
 
   React.useEffect(() => {
     getReport();
   }, [id]);
+
+  React.useEffect(() => {
+    if (files.length === 0) {
+      onNoFiles();
+    }
+  }, [files, onNoFiles]);
 
   const getReport = async () => {
     setLoading(true);
@@ -170,7 +177,12 @@ export function TaskReport({ id }: TaskReportProps) {
           <CircularProgress />
         </Box>
       ) : files.length === 0 ? (
-        <Typography variant="body1">Files not found</Typography>
+        <>
+          <Typography variant="body1">Files not found</Typography>
+          <Button variant="outlined" onClick={onNoFiles}>
+            Create New Task
+          </Button>
+        </>
       ) : (
         <List>
           {files.map((file: string) => (

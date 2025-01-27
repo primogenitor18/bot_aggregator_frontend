@@ -32,6 +32,13 @@ interface ITask {
   full_report: string;
 }
 
+interface ApiResponse<T = any> {
+  status: number;
+  body?: T;
+  result?: T;
+  count?: T;
+}
+
 export function Tasks() {
   const [tasks, setTasks] = React.useState<ITask[]>([]);
   const [tasksCount, setTasksCount] = React.useState<number>(0);
@@ -41,49 +48,45 @@ export function Tasks() {
   const [selectedTaskId, setSelectedTaskId] = React.useState<number | null>(
     null
   );
-  const [openReportModal, setOpenReportModal] = React.useState(false);
 
   const [openModal, setOpenModal] = React.useState(false);
-
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
+  const [modalType, setModalType] = React.useState<"report" | "create">(
+    "create"
+  );
 
   const handleOpenReportModal = (taskId: number | null) => {
     setSelectedTaskId(taskId);
-    setOpenReportModal(true);
+    setModalType("report");
+    setOpenModal(true);
   };
-  const handleCloseReportModal = () => {
+
+  const handleOpenCreateModal = () => {
+    setModalType("create");
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
     setSelectedTaskId(null);
-    setOpenReportModal(false);
+    setOpenModal(false);
+  };
+
+  const handleNoFiles = () => {
+    setModalType("create");
+    setOpenModal(true);
   };
 
   React.useEffect(() => {
     getTasks();
   }, [offset, limit]);
 
-  const mockTasks: ITask[] = [
-    {
-      id: 1,
-      task_id: "task_001",
-      filename: "file_1.txt",
-      status: "completed",
-      created_at: new Date("2023-01-01"),
-      full_report: "report_1.txt",
-    },
-    {
-      id: 2,
-      task_id: "task_002",
-      filename: "file_2.txt",
-      status: "pending",
-      created_at: new Date("2023-01-02"),
-      full_report: "",
-    },
-  ];
-
   const getTasks = async () => {
     setLoading(true);
     const api = new BaseApi(1, "search/search_tasks/list");
-    let res = await api.get({ limit: limit, offset: offset }, () => {}, {});
+    let res: ApiResponse = await api.get(
+      { limit: limit, offset: offset },
+      () => {},
+      {}
+    );
     if (res.status === 200) {
       setTasks(
         res.body.result.map((task: any) => {
@@ -91,7 +94,7 @@ export function Tasks() {
             id: task.id,
             task_id: task.task_id,
             filename: task.filename,
-            status: task.status,
+            status: task.stastus,
             created_at: new Date(task.created_at),
             full_report: task.full_report,
           } as ITask;
@@ -101,14 +104,6 @@ export function Tasks() {
     }
     setLoading(false);
   };
-
-  // const getTasks = async () => {
-  //   setLoading(true);
-  //   //фиктивные данные
-  //   setTasks(mockTasks);
-  //   setTasksCount(mockTasks.length);
-  //   setLoading(false);
-  // };
 
   const restartTask = async (task_id: number) => {
     setLoading(true);
@@ -150,27 +145,15 @@ export function Tasks() {
       }}
     >
       <Typography variant="h6" color="primary">
-        <Button variant="contained" color="primary" onClick={handleOpenModal}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleOpenCreateModal}
+        >
           Create Task
         </Button>
       </Typography>
-      <Modal open={openModal} onClose={handleCloseModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            borderRadius: "8px",
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <TaskCreate onTaskCreated={handleCloseModal} />
-        </Box>
-      </Modal>
+
       {loading ? (
         <CircularProgress />
       ) : (
@@ -282,7 +265,7 @@ export function Tasks() {
           </Paper>
         </>
       )}
-      <Modal open={openReportModal} onClose={handleCloseReportModal}>
+      <Modal open={openModal} onClose={handleCloseModal}>
         <Box
           sx={{
             position: "absolute",
@@ -296,7 +279,12 @@ export function Tasks() {
             p: 4,
           }}
         >
-          {selectedTaskId && <TaskReport id={selectedTaskId} />}
+          {modalType === "create" && (
+            <TaskCreate onTaskCreated={() => setOpenModal(false)} />
+          )}
+          {modalType === "report" && selectedTaskId && (
+            <TaskReport id={selectedTaskId} onNoFiles={handleNoFiles} />
+          )}
         </Box>
       </Modal>
     </Box>
