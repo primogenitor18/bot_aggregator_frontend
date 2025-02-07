@@ -8,5 +8,5 @@ export interface ISearchResult {
 }
 
 export interface IProviderInfo {
-  name: string
+  name: string;
 }

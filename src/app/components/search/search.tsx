@@ -1,167 +1,199 @@
-"use client"
+"use client";
 
-import * as React from 'react';
-import Paper from '@mui/material/Paper';
-import InputBase from '@mui/material/InputBase';
-import IconButton from '@mui/material/IconButton';
-import SearchIcon from '@mui/icons-material/Search';
-import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
+import * as React from "react";
+import Paper from "@mui/material/Paper";
+import InputBase from "@mui/material/InputBase";
+import IconButton from "@mui/material/IconButton";
+import SearchIcon from "@mui/icons-material/Search";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
 
-import { SearchResult } from './result';
+import { SearchResult } from "./result";
 
-import { IProviderInfo } from './interfaces';
+import { IProviderInfo } from "./interfaces";
 
-import { BaseApi } from '@/app/api/base';
+import { BaseApi } from "@/app/api/base";
 
-import { INameDictMap } from '@/app/types/props';
+import { INameDictMap } from "@/app/types/props";
+import { FormControl, InputLabel } from "@mui/material";
 
 interface ISearchData {
-  socketMessages?: INameDictMap
+  socketMessages?: INameDictMap;
 }
 
 export function SearchData(props: ISearchData) {
-  const [fts, setFts] = React.useState<string>('')
-  const [startSearch, setStartSearch] = React.useState<boolean>(true)
-  const [loading, setLoading] = React.useState<boolean>(false)
-  const [providers, setProviders] = React.useState<IProviderInfo[]>([])
-  const [country, setCountry] = React.useState<string>('RU')
-  const [searchType, setSearchType] = React.useState<string>('name')
-
-  React.useEffect(() => {getProviders()}, [])
+  const [fts, setFts] = React.useState<string>("");
+  const [startSearch, setStartSearch] = React.useState<boolean>(false);
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [providers, setProviders] = React.useState<IProviderInfo[]>([]);
+  const [country, setCountry] = React.useState<string>("");
+  const [searchType, setSearchType] = React.useState<string>("");
 
   React.useEffect(() => {
-    if (!fts) { return }
-    const listener = (event: any) => {
-      if (event.code === "Enter" || event.code === "NumpadEnter") {
-        setStartSearch(true)
-      }
-    };
-    document.addEventListener("keydown", listener);
-    return () => {
-      document.removeEventListener("keydown", listener);
-    };
-  }, [fts]);
+    getProviders();
+  }, []);
+
+  const handleSearch = () => {
+    setStartSearch(true);
+  };
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setStartSearch(false);
+    setFts(e.target.value);
+  };
 
   const getProviders = async () => {
-    setLoading(true)
-    const api = new BaseApi(1, 'provider/list');
-    let res = await api.get(
-      {}, () => {}, {}
-    );
-    if (res.status === 200) {
-      setProviders(res.body)
-    };
-    setLoading(false)
-  }
+    setLoading(true);
+    const api = new BaseApi(1, "provider/list");
+    try {
+      const res: { status: number; body?: any } = await api.get(
+        {},
+        () => {},
+        {}
+      );
+      if (res.status === 200 && Array.isArray(res.body)) {
+        setProviders(res.body || []);
+      }
+    } catch (error) {
+      console.error("Error fetching providers:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Box
       sx={{
-        width: '80%',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-        marginTop: '20px',
+        marginLeft: "auto",
+        marginRight: "auto",
+        marginTop: "20px",
+
+        display: "flex",
+        flexDirection: "column",
+        gap: 2,
+        alignItems: "center",
+        width: "800px",
+        border: "2px solid",
+        borderColor: "primary.main",
+        borderRadius: "8px",
+        padding: 2,
+        boxShadow: 2,
       }}
     >
-      {loading
-        ? <CircularProgress />
-        : <>
-            <Box sx={{ display: 'flex', marginBottom: '20px' }}>
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <>
+          <Box
+            sx={{
+              width: "80%",
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              alignItems: "center",
+            }}
+          >
+            <FormControl fullWidth>
+              <InputLabel id="country-select-id">Country</InputLabel>
               <Select
-                sx={{ width: '200px', marginLeft: '5px', marginRight: '5px' }}
-                id='country-select-id'
+                labelId="country-select-id"
+                id="country-select-id"
                 value={country}
                 label="Country"
-                onChange={
-                  (e: SelectChangeEvent) => {
-                    setCountry(e.target.value)
-                  }
-                }
+                onChange={(e: SelectChangeEvent) => {
+                  setCountry(e.target.value);
+                }}
               >
-                <MenuItem value={'RU'}>Russia</MenuItem>
-                <MenuItem value={'UA'}>Ukraine</MenuItem>
-                <MenuItem value={'BY'}>Belarus</MenuItem>
-                <MenuItem value={'KZ'}>Kazakhstan</MenuItem>
+                <MenuItem value={"RU"}>Russia</MenuItem>
+                <MenuItem value={"UA"}>Ukraine</MenuItem>
+                <MenuItem value={"BY"}>Belarus</MenuItem>
+                <MenuItem value={"KZ"}>Kazakhstan</MenuItem>
               </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel id="search-type-select-id">Parameters</InputLabel>
               <Select
-                sx={{ width: '200px', marginLeft: '5px', marginRight: '5px' }}
-                id='search-type-select-id'
+                labelId="search-type-select-id"
+                id="search-type-select-id"
                 value={searchType}
                 label="Search type"
-                onChange={
-                  (e: SelectChangeEvent) => {
-                    setSearchType(e.target.value)
-                  }
-                }
+                onChange={(e: SelectChangeEvent) => {
+                  setSearchType(e.target.value);
+                }}
               >
-                <MenuItem value={'name'}>Full name</MenuItem>
-                <MenuItem value={'phone'}>Phone</MenuItem>
-                <MenuItem value={'email'}>Email</MenuItem>
-                <MenuItem value={'pasport'}>Passport</MenuItem>
-                <MenuItem value={'inn'}>INN</MenuItem>
-                <MenuItem value={'snils'}>Snils</MenuItem>
-                <MenuItem value={'address'}>Address</MenuItem>
-                <MenuItem value={'auto'}>Auto</MenuItem>
-                <MenuItem value={'ogrn'}>OGRN</MenuItem>
+                <MenuItem value={"name"}>Full name</MenuItem>
+                <MenuItem value={"phone"}>Phone</MenuItem>
+                <MenuItem value={"email"}>Email</MenuItem>
+                <MenuItem value={"pasport"}>Passport</MenuItem>
+                <MenuItem value={"inn"}>INN</MenuItem>
+                <MenuItem value={"snils"}>Snils</MenuItem>
+                <MenuItem value={"address"}>Address</MenuItem>
+                <MenuItem value={"auto"}>Auto</MenuItem>
+                <MenuItem value={"ogrn"}>OGRN</MenuItem>
               </Select>
-            </Box>
-            <Paper
-              sx={{ p: '2px 4px', display: 'flex', alignItems: 'center' }}
+            </FormControl>
+          </Box>
+          <Paper
+            sx={{
+              p: "2px 4px",
+              display: "flex",
+              alignItems: "center",
+              width: "80%",
+            }}
+          >
+            <InputBase
+              sx={{ ml: 1, flex: 1 }}
+              placeholder="Search"
+              inputProps={{ "aria-label": "search" }}
+              value={fts}
+              onChange={handleInputChange}
+            />
+            <IconButton
+              type="button"
+              sx={{ p: "10px" }}
+              aria-label="search"
+              onClick={handleSearch}
             >
-              <InputBase
-                sx={{ ml: 1, flex: 1 }}
-                placeholder="Search"
-                inputProps={{ 'aria-label': 'search' }}
-                value={fts}
-                onChange={
-                  (e: React.ChangeEvent) => {
-                    setStartSearch(false)
-                    setFts(e.target.value)
-                  }
-                }
-              />
-              <IconButton
-                type="button"
-                sx={{ p: '10px' }}
-                aria-label="search"
-                onClick={
-                  () => {
-                    setStartSearch(true)
-                  }
-                }
-              >
-                <SearchIcon />
-              </IconButton>
-            </Paper>
-            {providers.length
-              ? <Box
-                  sx={{
-                    marginTop: '10px',
-                    display: 'flex',
-                    overflowX: 'auto',
-                  }}
-                >
-                  {providers.map((provider) => {
-                    return (
-                      <SearchResult
-                        fts={fts}
-                        provider={provider.name}
-                        search={startSearch}
-                        searchType={searchType}
-                        country={country}
-                        key={`provider-result-key-${provider.name}`}
-                        socketMessages={props.socketMessages}
-                      />
-                    )
-                  })}
-                </Box>
-              : ''
-            }
-          </>
-      }
+              <SearchIcon />
+            </IconButton>
+          </Paper>
+          {providers.length ? (
+            <Box
+              sx={{
+                marginLeft: "auto",
+                marginRight: "auto",
+                marginTop: "20px",
+                display: "flex",
+                flexWrap: "wrap",
+                gap: 2,
+                justifyContent: "center",
+                alignItems: "center",
+                width: "760px",
+              }}
+            >
+              {providers.map((provider) => {
+                return (
+                  <SearchResult
+                    fts={fts}
+                    provider={provider.name}
+                    search={startSearch}
+                    searchType={searchType}
+                    country={country}
+                    key={`provider-result-key-${provider.name}`}
+                    socketMessages={props.socketMessages}
+                  />
+                );
+              })}
+            </Box>
+          ) : (
+            ""
+          )}
+        </>
+      )}
     </Box>
   );
 }
