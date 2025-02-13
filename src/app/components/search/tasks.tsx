@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Table from "@mui/material/Table";
@@ -158,13 +156,38 @@ export function Tasks() {
         <CircularProgress />
       ) : (
         <>
-          <Paper sx={{ width: "800px", mb: 2 }}>
+          <Paper
+            sx={{
+              width: "90%",
+              marginBottom: 2,
+              borderRadius: "12px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+              overflowX: "auto",
+              padding: 2,
+              "& table": {
+                width: "100%",
+                borderCollapse: "collapse",
+              },
+              "& th, & td": {
+                textAlign: "center",
+                padding: "12px 16px",
+                borderBottom: "1px solid #ddd",
+              },
+              "& th": {
+                fontWeight: "bold",
+                backgroundColor: "#f4f4f4",
+              },
+              "& tr:hover": {
+                backgroundColor: "#f9f9f9",
+              },
+            }}
+          >
             <TableContainer component={Paper}>
               <Table
                 sx={{
-                  minWidth: 650,
+                  minWidth: 450,
                   "& th": { fontWeight: "bold", textAlign: "center" },
-                  "& td, & th": { padding: "8px 16px" },
+                  "& td, & th": { padding: "4px" },
                 }}
                 size="small"
                 aria-label="tasks table"
@@ -205,7 +228,9 @@ export function Tasks() {
                           sx={{ textTransform: "none" }}
                           onClick={() => handleOpenReportModal(task.id)}
                         >
-                          {task.task_id}
+                          {task.task_id.length > 15
+                            ? task.task_id.toString().slice(0, 15) + "..."
+                            : task.task_id.toString()}
                         </Button>
                       </TableCell>
                       <TableCell align="center">{task.status}</TableCell>
@@ -218,11 +243,10 @@ export function Tasks() {
                           target="_blank"
                           sx={{ textTransform: "none" }}
                         >
-                          {
-                            task.filename.split("/")[
-                              task.filename.split("/").length - 1
-                            ]
-                          }
+                          {task.filename
+                            .split("/")
+                            [task.filename.split("/").length - 1].toString()
+                            .slice(0, 15) + "..."}
                         </Button>
                       </TableCell>
                       <TableCell align="center">

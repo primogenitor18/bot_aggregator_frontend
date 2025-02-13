@@ -5,7 +5,6 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -53,29 +52,37 @@ export default function ButtonAppBar(props: IBarProps) {
         position="static"
         color="transparent"
         sx={{
-          paddingLeft: "100px",
-          paddingRight: "100px",
+          paddingLeft: "20px",
+          paddingRight: "20px",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
           width: "100%",
+          "@media (max-width: 600px)": {
+            paddingLeft: "10px",
+            paddingRight: "10px",
+          },
         }}
       >
         <Toolbar
           sx={{
-            width: "800px",
+            width: "100%",
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
+            padding: "10px",
           }}
         >
           <Fade in={show} timeout={1000}>
             <Box
               sx={{
-                width: "800px",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                width: "100%",
+                "@media (max-width: 600px)": {
+                  justifyContent: "space-between",
+                },
               }}
             >
               <IconButton
@@ -87,15 +94,20 @@ export default function ButtonAppBar(props: IBarProps) {
               >
                 <MenuIcon />
               </IconButton>
-              <Image src="/shum.png" alt="shum" width={40} height={20} />
+
+              <Box sx={{ display: { xs: "none", sm: "block" } }}>
+                <Image src="/shum.png" alt="shum" width={40} height={20} />
+              </Box>
+
               <Typography
                 variant="h6"
                 component="div"
-                sx={{ fontSize: "24px" }}
+                sx={{ fontSize: "24px", display: { xs: "none", sm: "block" } }}
                 color="primary"
               >
                 {username ? `Hello, ${username}` : "Hello"}
               </Typography>
+
               <IconButton
                 size="large"
                 onClick={() => {
