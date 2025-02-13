@@ -56,6 +56,7 @@ export class BaseApi {
         callback({ ...current_state, logged_in: false });
       }
     }
+
     let res = { status: 400, body: {} };
     try {
       res = { status: response.status, body: await response.json() };

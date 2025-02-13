@@ -28,8 +28,8 @@ export function SearchData(props: ISearchData) {
   const [startSearch, setStartSearch] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
   const [providers, setProviders] = React.useState<IProviderInfo[]>([]);
-  const [country, setCountry] = React.useState<string>("");
-  const [searchType, setSearchType] = React.useState<string>("");
+  const [country, setCountry] = React.useState<string>("RU");
+  const [searchType, setSearchType] = React.useState<string>("name");
 
   React.useEffect(() => {
     getProviders();
@@ -71,30 +71,43 @@ export function SearchData(props: ISearchData) {
         marginLeft: "auto",
         marginRight: "auto",
         marginTop: "20px",
-
         display: "flex",
         flexDirection: "column",
         gap: 2,
         alignItems: "center",
-        width: "800px",
+        width: "95%",
+        // maxWidth: "800px",
         border: "2px solid",
         borderColor: "primary.main",
         borderRadius: "8px",
         padding: 2,
         boxShadow: 2,
+        "@media (max-width: 800px)": {
+          width: "95%",
+        },
       }}
     >
       {loading ? (
-        <CircularProgress />
+        <CircularProgress
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
       ) : (
         <>
           <Box
             sx={{
-              width: "80%",
+              width: "100%",
+              maxWidth: "800px",
+
               display: "flex",
               flexDirection: "column",
               gap: 2,
               alignItems: "center",
+              paddingX: 2,
             }}
           >
             <FormControl fullWidth>
@@ -137,42 +150,63 @@ export function SearchData(props: ISearchData) {
               </Select>
             </FormControl>
           </Box>
-          <Paper
+
+          <Box
             sx={{
-              p: "2px 4px",
+              paddingLeft: "16px",
+              paddingRight: "16px",
               display: "flex",
               alignItems: "center",
-              width: "80%",
+              width: "100%",
+              maxWidth: "800px",
+              margin: "auto",
             }}
           >
-            <InputBase
-              sx={{ ml: 1, flex: 1 }}
-              placeholder="Search"
-              inputProps={{ "aria-label": "search" }}
-              value={fts}
-              onChange={handleInputChange}
-            />
-            <IconButton
-              type="button"
-              sx={{ p: "10px" }}
-              aria-label="search"
-              onClick={handleSearch}
+            <Paper
+              sx={{
+                p: "2px 4px",
+                display: "flex",
+                width: "100%",
+              }}
             >
-              <SearchIcon />
-            </IconButton>
-          </Paper>
+              <InputBase
+                sx={{ ml: 1, flex: 1 }}
+                placeholder="Search"
+                inputProps={{ "aria-label": "search" }}
+                value={fts}
+                onChange={handleInputChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                  }
+                }}
+              />
+              <IconButton
+                type="button"
+                sx={{ p: "10px" }}
+                aria-label="search"
+                onClick={handleSearch}
+              >
+                <SearchIcon />
+              </IconButton>
+            </Paper>
+          </Box>
+
           {providers.length ? (
             <Box
               sx={{
                 marginLeft: "auto",
                 marginRight: "auto",
-                marginTop: "20px",
                 display: "flex",
-                flexWrap: "wrap",
+                flexWrap: "nowrap",
                 gap: 2,
-                justifyContent: "center",
-                alignItems: "center",
-                width: "760px",
+                justifyContent: "space-between",
+                width: "100%",
+                overflowX: "auto",
+                "& > *": {
+                  flex: "1 1 calc(100% / 3)",
+                  minWidth: "200px",
+                },
               }}
             >
               {providers.map((provider) => {

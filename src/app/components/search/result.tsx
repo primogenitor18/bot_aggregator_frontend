@@ -13,6 +13,13 @@ import { BaseApi } from "@/app/api/base";
 import { ISearchResult, IProviderSearchResult } from "./interfaces";
 
 import { INameDictMap } from "@/app/types/props";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 
 interface ISearchResultProps {
   fts: string;
@@ -46,19 +53,21 @@ function SearchResultItem(props: ISearchResultItem) {
   return (
     <>
       {Object.keys(props.sr).map((k: string) => {
-        if (props.sr[k].toString()) {
+        if (
+          props.sr[k] !== null &&
+          props.sr[k] !== undefined &&
+          props.sr[k].toString()
+        ) {
           return (
             <Typography key={`result-key-${k}`} variant="body2">
               {k}:{" "}
-              {k !== "link" ? (
+              {k !== "sourceUrl" ? (
                 props.sr[k].toString()
               ) : (
-                <a
-                  href={props.sr[k].toString()}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {props.sr[k].toString()}
+                <a href={props.sr[k]} target="_blank" rel="noopener noreferrer">
+                  {props.sr[k].toString().length > 30
+                    ? props.sr[k].toString().slice(0, 30) + "..."
+                    : props.sr[k].toString()}
                 </a>
               )}
             </Typography>
@@ -84,14 +93,30 @@ export function SearchResult(props: ISearchResultProps) {
   });
   const [acceptSearch, setAcceptSearch] = React.useState<boolean>(true);
 
+  const [searchStart, setSearchStart] = React.useState<boolean>(false);
+  const [inputChange, setInputChange] = React.useState<boolean>(false);
+
+  const [firstLoad, setFirstLoad] = React.useState<boolean>(false);
+
+  // React.useEffect(() => {
+  //   getProviderInfo();
+  // }, []);
+
   React.useEffect(() => {
-    getProviderInfo();
+    setFirstLoad(true);
   }, []);
 
   React.useEffect(() => {
+    if (props.fts) {
+      setInputChange(true);
+      setFirstLoad(false);
+    }
+    if (props.search) {
+      setSearchStart(true);
+    }
     if (!acceptSearch || props.fts === "" || !props.search) return;
     getSearchData();
-  }, [props.fts, props.search]);
+  }, [props.fts, props.search, acceptSearch]);
 
   const getProviderInfo = async () => {
     const api = new BaseApi(1, "provider/get_info");
@@ -110,35 +135,75 @@ export function SearchResult(props: ISearchResultProps) {
 
   const getSearchData = async () => {
     setProgress(true);
-    const api = new BaseApi(1, "search/fts");
-    let res: ApiResponse = await api.post(
-      {
-        fts: props.fts,
-        provider: props.provider,
-        search_type: props.searchType,
-        country: props.country,
-      },
-      "application/json",
-      () => {},
-      {}
-    );
-    if (res.status === 200 && res.body) {
-      setSearchData(res?.body);
-      await getProviderInfo();
+
+    try {
+      const api = new BaseApi(1, "search/fts");
+      let res: ApiResponse = await api.post(
+        {
+          fts: props.fts,
+          provider: props.provider,
+          search_type: props.searchType,
+          country: props.country,
+        },
+        "application/json",
+        () => {},
+        {}
+      );
+
+      if (res.status === 200 && res.body) {
+        setSearchData(res?.body);
+        await getProviderInfo();
+      }
+    } catch (error) {
+      setSearchStart(false);
+      setFirstLoad(false);
+      console.error(error);
+    } finally {
+      setProgress(false);
+      setInputChange(false);
     }
-    setProgress(false);
   };
 
   const results: any =
     props.socketMessages?.[props.provider]?.data || searchData.data;
 
   return (
-    <Box sx={{ minWidth: 200, maxWidth: 400 }}>
-      <Card variant="outlined">
+    <Box
+      sx={{
+        MaxWidth: "100%",
+        display:
+          (searchStart && searchData.data.length > 0) ||
+          firstLoad ||
+          inputChange
+            ? "block"
+            : "none",
+        backgroundColor: "#fff",
+        borderRadius: "12px",
+        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        transition: "box-shadow 0.3s ease-in-out",
+        "&:hover": {
+          boxShadow: "0 8px 16px rgba(0, 0, 0, 0.15)",
+        },
+      }}
+    >
+      <Card
+        variant="outlined"
+        sx={{
+          display: "block",
+          padding: "10px 15px",
+          border: "1px solid #ccc",
+          borderRadius: "8px",
+          backgroundColor: "#f9f9f9",
+          width: "100%",
+        }}
+      >
         <CardHeader
           title={
-            <Box sx={{ display: "flex" }}>
+            <Box
+              sx={{ display: "flex", justifyContent: "center", padding: "5px" }}
+            >
               <Checkbox
+                sx={{ alignItems: "center" }}
                 defaultChecked
                 onChange={(e) => {
                   setAcceptSearch(e.target.checked);
@@ -147,18 +212,31 @@ export function SearchResult(props: ISearchResultProps) {
               <Typography variant="h5">{props.provider}</Typography>
             </Box>
           }
+          sx={{ padding: "5px" }}
         />
         <Box>{progress ? <LinearProgress /> : ""}</Box>
-        <CardContent>
-          <Typography>
+
+        <CardContent sx={{ padding: "5px" }}>
+          <Typography sx={{ display: "flex", justifyContent: "center" }}>
             Completed requests: {providerInfo.queryCountAll}
           </Typography>
-          <Typography>
+          <Typography sx={{ display: "flex", justifyContent: "center" }}>
             Remaining requests: {providerInfo.queryCountApiLimit}
           </Typography>
           <Divider sx={{ marginTop: "5px", marginBottom: "5px" }} />
+
           {results.map((sr: ISearchResultItem, index: number) => (
-            <SearchResultItem sr={sr} key={`search-result-${index}`} />
+            <Box
+              key={`result-${index}`}
+              sx={{
+                backgroundColor: "#fff",
+                padding: "8px",
+                marginBottom: "8px",
+                boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              <SearchResultItem sr={sr} />
+            </Box>
           ))}
         </CardContent>
       </Card>
