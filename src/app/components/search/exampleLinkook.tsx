@@ -1,0 +1,33 @@
+export const defaultData = {
+  username: "JackJuly",
+  accounts_found: 11,
+  sites_found: 10,
+  related_usernames_count: 6,
+  related_emails_count: 2,
+  breached_emails_count: 1,
+  related_usernames: [
+    "july0x0",
+    "Jack_July",
+    "JackJuly",
+    "unagi_0_0_",
+    "july",
+    "Jackey-M",
+  ],
+  related_emails: ["julyO0x0@proton.me", "hello@gmail.com"],
+  breached_emails: ["hello@gmail.com"],
+  found_accounts: {
+    GitHub: "https://github.com/JackJuly",
+    "Buy Me a Coffee": "https://buymeacoffee.com/july",
+    Reddit: [
+      "https://reddit.com/user/JackJuly",
+      "https://reddit.com/user/Jackey-M",
+    ],
+    "X(Twitter)": "https://x.com/Jack_July",
+    HackerOne: "https://hackerone.com/july",
+    Linktree: "https://linktr.ee/JackJuly",
+    YouTube: "https://youtube.com/user/july0x0",
+    LinkedIn: "https://www.linkedin.com/in/yuan-ma—5b140827b",
+    "Hack The Box": "https://app.hackthebox.com/profile/1261091",
+    Instagram: "https://instagram.com/unagi_0_0_",
+  },
+};

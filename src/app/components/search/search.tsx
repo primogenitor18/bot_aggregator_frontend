@@ -18,6 +18,7 @@ import { BaseApi } from "@/app/api/base";
 
 import { INameDictMap } from "@/app/types/props";
 import { FormControl, InputLabel } from "@mui/material";
+import { SearchById } from "./searchId";
 
 interface ISearchData {
   socketMessages?: INameDictMap;
@@ -30,6 +31,7 @@ export function SearchData(props: ISearchData) {
   const [providers, setProviders] = React.useState<IProviderInfo[]>([]);
   const [country, setCountry] = React.useState<string>("RU");
   const [searchType, setSearchType] = React.useState<string>("name");
+  const [searchParams, setSearchParams] = React.useState<string>("Params");
 
   React.useEffect(() => {
     getProviders();
@@ -111,44 +113,68 @@ export function SearchData(props: ISearchData) {
             }}
           >
             <FormControl fullWidth>
-              <InputLabel id="country-select-id">Country</InputLabel>
+              <InputLabel id="select-search">Search params</InputLabel>
               <Select
-                labelId="country-select-id"
-                id="country-select-id"
-                value={country}
-                label="Country"
+                labelId="select-search"
+                id="select-search"
+                value={searchParams}
+                label="Search params"
                 onChange={(e: SelectChangeEvent) => {
-                  setCountry(e.target.value);
+                  setSearchParams(e.target.value);
+                  setFts("");
+                  setStartSearch(false);
                 }}
               >
-                <MenuItem value={"RU"}>Russia</MenuItem>
-                <MenuItem value={"UA"}>Ukraine</MenuItem>
-                <MenuItem value={"BY"}>Belarus</MenuItem>
-                <MenuItem value={"KZ"}>Kazakhstan</MenuItem>
+                <MenuItem value={"Params"}>By search params</MenuItem>
+                <MenuItem value={"Id"}>By Id or email</MenuItem>
               </Select>
             </FormControl>
-            <FormControl fullWidth>
-              <InputLabel id="search-type-select-id">Parameters</InputLabel>
-              <Select
-                labelId="search-type-select-id"
-                id="search-type-select-id"
-                value={searchType}
-                label="Search type"
-                onChange={(e: SelectChangeEvent) => {
-                  setSearchType(e.target.value);
-                }}
-              >
-                <MenuItem value={"name"}>Full name</MenuItem>
-                <MenuItem value={"phone"}>Phone</MenuItem>
-                <MenuItem value={"email"}>Email</MenuItem>
-                <MenuItem value={"pasport"}>Passport</MenuItem>
-                <MenuItem value={"inn"}>INN</MenuItem>
-                <MenuItem value={"snils"}>Snils</MenuItem>
-                <MenuItem value={"address"}>Address</MenuItem>
-                <MenuItem value={"auto"}>Auto</MenuItem>
-                <MenuItem value={"ogrn"}>OGRN</MenuItem>
-              </Select>
-            </FormControl>
+
+            {searchParams === "Params" ? (
+              <>
+                <FormControl fullWidth>
+                  <InputLabel id="country-select-id">Country</InputLabel>
+                  <Select
+                    labelId="country-select-id"
+                    id="country-select-id"
+                    value={country}
+                    label="Country"
+                    onChange={(e: SelectChangeEvent) => {
+                      setCountry(e.target.value);
+                    }}
+                  >
+                    <MenuItem value={"RU"}>Russia</MenuItem>
+                    <MenuItem value={"UA"}>Ukraine</MenuItem>
+                    <MenuItem value={"BY"}>Belarus</MenuItem>
+                    <MenuItem value={"KZ"}>Kazakhstan</MenuItem>
+                  </Select>
+                </FormControl>
+                <FormControl fullWidth>
+                  <InputLabel id="search-type-select-id">Parameters</InputLabel>
+                  <Select
+                    labelId="search-type-select-id"
+                    id="search-type-select-id"
+                    value={searchType}
+                    label="Search type"
+                    onChange={(e: SelectChangeEvent) => {
+                      setSearchType(e.target.value);
+                    }}
+                  >
+                    <MenuItem value={"name"}>Full name</MenuItem>
+                    <MenuItem value={"phone"}>Phone</MenuItem>
+                    <MenuItem value={"email"}>Email</MenuItem>
+                    <MenuItem value={"pasport"}>Passport</MenuItem>
+                    <MenuItem value={"inn"}>INN</MenuItem>
+                    <MenuItem value={"snils"}>Snils</MenuItem>
+                    <MenuItem value={"address"}>Address</MenuItem>
+                    <MenuItem value={"auto"}>Auto</MenuItem>
+                    <MenuItem value={"ogrn"}>OGRN</MenuItem>
+                  </Select>
+                </FormControl>
+              </>
+            ) : (
+              ""
+            )}
           </Box>
 
           <Box
@@ -192,7 +218,7 @@ export function SearchData(props: ISearchData) {
             </Paper>
           </Box>
 
-          {providers.length ? (
+          {providers.length && searchParams === "Params" ? (
             <Box
               sx={{
                 marginLeft: "auto",
@@ -222,6 +248,32 @@ export function SearchData(props: ISearchData) {
                   />
                 );
               })}
+            </Box>
+          ) : (
+            ""
+          )}
+
+          {searchParams === "Id" ? (
+            <Box
+              sx={{
+                marginLeft: "auto",
+                marginRight: "auto",
+                marginTop: "20px",
+                display: "flex",
+                flexDirection: "column",
+                gap: 2,
+                alignItems: "center",
+                width: "95%",
+                border: "2px solid",
+                borderColor: "primary.main",
+                borderRadius: "8px",
+                padding: 2,
+                "@media (max-width: 800px)": {
+                  width: "95%",
+                },
+              }}
+            >
+              <SearchById fts={fts} search={startSearch} />
             </Box>
           ) : (
             ""
