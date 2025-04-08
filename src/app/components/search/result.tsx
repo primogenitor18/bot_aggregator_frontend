@@ -19,6 +19,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Link,
 } from "@mui/material";
 
 interface ISearchResultProps {
@@ -64,11 +65,19 @@ function SearchResultItem(props: ISearchResultItem) {
               {k !== "sourceUrl" ? (
                 props.sr[k].toString()
               ) : (
-                <a href={props.sr[k]} target="_blank" rel="noopener noreferrer">
+                <Link 
+                href={props.sr[k]} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                sx={{ 
+                  color: 'primary.main',
+                  '&:hover': { color: 'primary.dark' }
+                }}
+              >
                   {props.sr[k].toString().length > 30
                     ? props.sr[k].toString().slice(0, 30) + "..."
                     : props.sr[k].toString()}
-                </a>
+                </Link>
               )}
             </Typography>
           );
