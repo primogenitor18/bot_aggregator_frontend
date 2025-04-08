@@ -9,6 +9,7 @@ import Box from "@mui/material/Box";
 import CircularProgress from "@mui/material/CircularProgress";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { FormControl, InputLabel, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 
 import { SearchResult } from "./result";
 
@@ -17,7 +18,6 @@ import { IProviderInfo } from "./interfaces";
 import { BaseApi } from "@/app/api/base";
 
 import { INameDictMap } from "@/app/types/props";
-import { FormControl, InputLabel } from "@mui/material";
 import { SearchById } from "./searchId";
 
 interface ISearchData {
@@ -32,6 +32,8 @@ export function SearchData(props: ISearchData) {
   const [country, setCountry] = React.useState<string>("RU");
   const [searchType, setSearchType] = React.useState<string>("name");
   const [searchParams, setSearchParams] = React.useState<string>("Params");
+  const [openModal, setOpenModal] = React.useState<boolean>(false);
+  const [pendingSearchParams, setPendingSearchParams] = React.useState<string>("");
 
   React.useEffect(() => {
     getProviders();
@@ -66,6 +68,37 @@ export function SearchData(props: ISearchData) {
       setLoading(false);
     }
   };
+
+  const handleModalClose = () => {
+    setOpenModal(false);
+    setPendingSearchParams("");
+  };
+
+  const handleStayOnPage = () => {
+    setOpenModal(false);
+    setPendingSearchParams("");
+  };
+
+  const handleModalConfirm = () => {
+    setOpenModal(false);
+    setSearchParams(pendingSearchParams);
+    setFts("");
+    setStartSearch(false);
+  };
+
+  const handleOpenInNewWindow = () => {
+    window.open("/?mode=Id", "_blank");
+    setOpenModal(false);
+    setPendingSearchParams("");
+  };
+
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    if (mode === 'Id') {
+      setSearchParams('Id');
+    }
+  }, []);
 
   return (
     <Box
@@ -120,9 +153,14 @@ export function SearchData(props: ISearchData) {
                 value={searchParams}
                 label="Search params"
                 onChange={(e: SelectChangeEvent) => {
-                  setSearchParams(e.target.value);
-                  setFts("");
-                  setStartSearch(false);
+                  if (e.target.value === "Id") {
+                    setOpenModal(true);
+                    setPendingSearchParams(e.target.value);
+                  } else {
+                    setSearchParams(e.target.value);
+                    setFts("");
+                    setStartSearch(false);
+                  }
                 }}
               >
                 <MenuItem value={"Params"}>By search params</MenuItem>
@@ -278,6 +316,25 @@ export function SearchData(props: ISearchData) {
           ) : (
             ""
           )}
+
+          <Dialog 
+            open={openModal} 
+            onClose={handleModalClose}
+            disableEscapeKeyDown
+          >
+            <DialogTitle>Choose Search Mode</DialogTitle>
+            <DialogContent>
+              Would you like to continue searching on this page or open search in a new window for dual monitor setup?
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleModalConfirm} color="primary">
+                Stay on this page
+              </Button>
+              <Button onClick={handleOpenInNewWindow} color="primary">
+                Open in new window
+              </Button>
+            </DialogActions>
+          </Dialog>
         </>
       )}
     </Box>
