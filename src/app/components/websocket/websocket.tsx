@@ -32,11 +32,11 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 
 export const WebSocket = (props: IWebsocketProps) => {
   // For testing on localhost
-  const backendUri =
-    process.env.NEXT_PUBLIC_WS_BACKEND_URI || "ws://localhost:3000";
-  let uri = new URL(`${backendUri}/websocket`);
+  //const backendUri =
+  //  process.env.NEXT_PUBLIC_WS_BACKEND_URI || "ws://localhost:3000";
+  //let uri = new URL(`${backendUri}/websocket`);
 
-  // let uri = new URL(`${process.env.NEXT_PUBLIC_WS_BACKEND_URI}/websocket`);
+  let uri = new URL(`${process.env.NEXT_PUBLIC_WS_BACKEND_URI}/websocket`);
   uri.searchParams.append("token", props.accessToken);
   const [socketUrl, setSocketUrl] = useState<string>(uri.href);
   const [open, setOpen] = React.useState<boolean>(false);
